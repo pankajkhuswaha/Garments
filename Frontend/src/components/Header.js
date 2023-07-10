@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { BsSearch, BsArrowRepeat, BsHeart, BsBag, BsX } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategories } from "../features/pcategory/pcategorySlice";
@@ -26,7 +26,7 @@ const Header = () => {
   const wish = useSelector((state) => state.wishlist.wishlist);
 
   const items = useSelector((state) => state.cart.cart);
-  const category = useSelector((state) => state.pCategory.pCategories);
+  console.log(items)
 
   const handleSearchClick = () => {
     const inputValue = document.getElementById("search-input").value;
@@ -78,6 +78,9 @@ const Header = () => {
       sidebar.style.left = "0";
     }
   };
+  // todo NEw code added by pankaj is here
+    const location = useLocation().pathname;
+    console.log(location.pathname)
 
   return (
     <>
@@ -91,12 +94,12 @@ const Header = () => {
               {!isOpen && <FaBars fontSize={22} onClick={toggleMenu} />}
               {isOpen && <RxCross2 fontSize={22} onClick={toggleMenu} />}
               <Link to={"/"} className="h4 text-light mt-2" style={{ fontWeight: "600" }}>
-                Mangla <br /> Garments
+                Mangla  Garments
               </Link>
             </div>
             <div className="col-4 d-none d-lg-flex  align-content-center justify-content-center">
               <div
-                className="input-group mt-3 mb-0"
+                className="input-group mt-1 mb-0"
                 style={{ height: "40px", marginTop: "5px" }}
               >
                 <input
@@ -249,28 +252,25 @@ const Header = () => {
               </span>
             </div>
           </div>
-          <NavLink className="menubtn" to="/" onClick={toggleMenu}>
+          <NavLink className={location==="/"?"menubtnActive":`menubtn`} to="/" onClick={toggleMenu}>
             Home
           </NavLink>
-          <NavLink className="menubtn" to="/app/product" onClick={toggleMenu}>
+          <NavLink  className={location.includes("product")?"menubtnActive":`menubtn`} to="/app/product" onClick={toggleMenu}>
             Store
           </NavLink>
-          <NavLink className="menubtn" to="/app/blogs" onClick={toggleMenu}>
+          <NavLink className={location.includes("blog")?"menubtnActive":`menubtn`} to="/app/blogs" onClick={toggleMenu}>
             Blogs
           </NavLink>
-          <NavLink className="menubtn" to="/app/blogs" onClick={toggleMenu}>
-            Blogs
-          </NavLink>
-          <NavLink className="menubtn" to="/app/contact" onClick={toggleMenu}>
+          <NavLink to={"/app/contact"} className={location.includes("contact")?"menubtnActive":`menubtn`} onClick={toggleMenu}>
             Contact Us
           </NavLink>
-          <NavLink className="menubtn" to="/app/about" onClick={toggleMenu}>
+          <NavLink to={"/app/about"} className={location.includes("about")?"menubtnActive":`menubtn`} onClick={toggleMenu}>
             About Us
           </NavLink>
 
           <Link
             to="/app/compare-products"
-            className="d-md-none d-flex menubtn gap-1"
+            className={location.includes("compare")?"d-md-none d-flex menubtnActive gap-1":`d-md-none d-flex menubtn gap-1`}
             style={{ marginRight: "-4px" }}
             onClick={toggleMenu}
           >
@@ -281,7 +281,7 @@ const Header = () => {
             {compare?.length ? compare.length : 0}
           </Link>
           {/* * Wishlist button */}
-          <Link to={"/app/wishlist"} onClick={toggleMenu} className="d-md-none d-flex gap-1 menubtn">
+          <Link to={"/app/wishlist"} onClick={toggleMenu} className={location.includes("wishlist")?"d-md-none d-flex menubtnActive gap-1":`d-md-none d-flex menubtn gap-1`}>
             <span className="mb-0  text-dark ">
               Wish List 
             </span>

@@ -62,24 +62,20 @@ const Footer = () => {
         </div>
       </footer>
 
-      <footer className=" pt-2">
+      <footer className=" pt-4">
         <div className="container-xxl">
           <div className="row d-flex flex-md-row">
             <div className="col-sm-4 mb-4">
               <h5 className="text-white mb-1">Contact Us </h5>
-              <div
-                className="text-dark my-2 d-flex gap-2 align-items-center"
-                style={{ fontWeight: "500" }}
-              >
-                {/* <img width={70} src={logo} alt="logo" /> */}
-                <h3 className="text-light " style={{ fontWeight: "600" }}>
-                  Mangla Market
+              <h3 className="text-light " style={{ fontWeight: "600" }}>
+                  Mangla Garments
                 </h3>
-              </div>
               <div>
                 <address className="text-white fs-6 lh-3">
-                  PLOT #4, MUJESSAR, near OLD MACHINE MARKET, Faridabad <br />{" "}
-                  Haryana 121001
+                  Manin Market,
+                  <br/>
+                  Near Ambedkar chowk <br/>
+                  GST No. 06ANQPM1689Q1ZY
                 </address>
                 {/* <a href="tel:+91 8264954234" className="mt-3 d-block mb-3 text-white">
                 +91 7042707091

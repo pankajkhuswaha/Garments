@@ -11,9 +11,9 @@ const { generateRefreshToken } = require("../config/refreshtoken");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("./emailCtrl");
-const mongoose=require('mongoose');
+const mongoose = require("mongoose");
 const { Console } = require("console");
-const ObjectId=mongoose.Types.ObjectId;
+const ObjectId = mongoose.Types.ObjectId;
 const cookies = require("cookie-parser");
 
 // Create a User ----------------------------------------------
@@ -22,7 +22,7 @@ const createUser = asyncHandler(async (req, res) => {
   /**
    * TODO:Get the email from req.body
    */
- 
+
   const email = req.body.email;
   /**
    * TODO:With the help of email find the user exists or not
@@ -34,13 +34,13 @@ const createUser = asyncHandler(async (req, res) => {
      * TODO:if user not found user create a new user
      */
     const newUser = await User.create(req.body);
-    res.json(newUser);  
+    res.json(newUser);
   } else {
     /**
      * TODO:if user found then thow an error: User already exists
      */
     throw new Error("User Already Exists");
-  } 
+  }
 });
 // Login a user
 const loginUserCtrl = asyncHandler(async (req, res) => {
@@ -49,21 +49,19 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
   const findUser = await User.findOne({ email });
   if (findUser && (await findUser.isPasswordMatched(password))) {
     const refreshToken = await generateRefreshToken(findUser?._id);
-    if(findUser.isBlocked===false){
+    if (findUser.isBlocked === false) {
       const updateuser = await User.findByIdAndUpdate(
         findUser.id,
         {
           refreshToken: refreshToken,
-        
-            
         },
         { new: true }
-      ).populate('wishlist');
+      ).populate("wishlist");
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 72 * 60 * 60 * 1000,
       });
-     
+
       res.json({
         _id: findUser?._id,
         firstname: findUser?.firstname,
@@ -71,18 +69,15 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
         email: findUser?.email,
         mobile: findUser?.mobile,
         token: generateToken(findUser?._id),
-        role:findUser?.role,
-        cart:findUser?.cart,
-        wishlist:findUser?.wishlist,
-        address:findUser?.address,
-       super:findUser?.super
-  
-  
+        role: findUser?.role,
+        cart: findUser?.cart,
+        wishlist: findUser?.wishlist,
+        address: findUser?.address,
+        super: findUser?.super,
       });
-    }else{
-      res.send({message:"you are block by  Super Admin"})
+    } else {
+      res.send({ message: "you are block by  Super Admin" });
     }
-   
   } else {
     throw new Error("Invalid Credentials");
   }
@@ -101,11 +96,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
       findAdmin.id,
       {
         refreshToken: refreshToken,
-    
       },
       { new: true }
     );
-
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -118,7 +111,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
       email: findAdmin?.email,
       mobile: findAdmin?.mobile,
       token: generateToken(findAdmin?._id),
-super:findAdmin
+      super: findAdmin,
     });
   } else {
     throw new Error("Invalid Credentials");
@@ -145,11 +138,12 @@ const handleRefreshToken = asyncHandler(async (req, res) => {
 // logout functionality
 
 const logout = asyncHandler(async (req, res) => {
-        console.log(req.cookies)
-  if (!req.cookies?.refreshToken) throw new Error("No Refresh Token in Cookies");
+  console.log(req.cookies);
+  if (!req.cookies?.refreshToken)
+    throw new Error("No Refresh Token in Cookies");
   const refreshToken = req.cookies.refreshToken;
   const user = await User.findOne({ refreshToken });
-console.log(user)
+  console.log(user);
   if (!user) {
     res.clearCookie("refreshToken", {
       httpOnly: true,
@@ -193,16 +187,16 @@ const updatedUser = asyncHandler(async (req, res) => {
 });
 const updateRole = asyncHandler(async (req, res) => {
   const { id } = req.params;
-console.log(id)
-  const {role}=req.body;
-console.log(role)
+  console.log(id);
+  const { role } = req.body;
+  console.log(role);
   validateMongoDbId(id);
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
       {
-        role:role
+        role: role,
       },
       {
         new: true,
@@ -214,12 +208,10 @@ console.log(role)
   }
 });
 
-
 // save user Address
 
 const saveAddress = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;
-  
 
   validateMongoDbId(_id);
 
@@ -236,7 +228,6 @@ const saveAddress = asyncHandler(async (req, res, next) => {
 
     // If address does not exist, create and save new address
     const newAddress = await Address.create(req.body);
-
 
     // Check if address already exists in User's address array
     const user = await User.findById(_id);
@@ -259,12 +250,15 @@ const saveAddress = asyncHandler(async (req, res, next) => {
         new: true,
       }
     );
-    res.json({ success: true, message: "Address saved successfully", user: updatedUser });
+    res.json({
+      success: true,
+      message: "Address saved successfully",
+      user: updatedUser,
+    });
   } catch (error) {
     throw new Error(error);
   }
 });
-
 
 // Get all users
 const getallUser = asyncHandler(async (req, res) => {
@@ -310,9 +304,8 @@ const deleteaUser = asyncHandler(async (req, res) => {
 
 const blockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id)
+  console.log(id);
   validateMongoDbId(id);
-
 
   try {
     const blockusr = await User.findByIdAndUpdate(
@@ -332,7 +325,7 @@ const blockUser = asyncHandler(async (req, res) => {
 
 const unblockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-console.log(id)
+  console.log(id);
   validateMongoDbId(id);
 
   try {
@@ -367,143 +360,135 @@ const updatePassword = asyncHandler(async (req, res) => {
 });
 
 //Reset The Password
-const forgetPasswordToken=asyncHandler(async(req,res)=>{
-  const {email}=req.body;
-console.log(email)
-  const user=await User.findOne({email});
-  if(!user) throw new Error('User Not find with this Email');
-  try{
-   const token=await user.createPasswordResetToken()
-   await user.save();
-  const resetUrl=`Hi the link for reset password is valid for 10 minutes only<a href='https://buysellanything.online/reset-password/${token}'>link</a>`
-  const data={
-      to:email,
-      sunject:'password reset Link',
-      text:'password reset link',
-      html:resetUrl,
+const forgetPasswordToken = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  console.log(toString(email));
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("User Not find with this Email");
+  try {
+    const token = await user.createPasswordResetToken();
+    console.log(token)
+    await user.save();
+    // const resetUrl = `Hi the link for reset password is valid for 10 minutes only<a href='https://buysellanything.online/reset-password/${token}'>link</a>`;
+    const sendData = `<h1 style=\"color: #333; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; margin-bottom: 16px;\">Password Reset<\/h1>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 8px;\">Hi there,<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 16px;\">We received a request to reset your password. Please click the link below to reset your password:<\/p>\r\n<p style=\"margin-bottom: 16px;\"><a href='http://localhost:3000/reset-password/${token}' style=\"background-color: #007bff; border-radius: 4px; color: #fff; display: inline-block; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; padding: 10px 16px; text-decoration: none;\">Reset Password<\/a><\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 16px;\">If you did not request a password reset, you can ignore this email and your password will not be changed.<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5;\">Thank you,<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 0;\">The Example Team<\/p>\r\n`
+    const data = {
+      to: email,
+      subject: "Password Reset Link",
+      // text: "password reset link",
+      html: sendData,
+    };
+    sendEmail(data);
+    res.json(token);
+  } catch (err) {}
+});
 
-  }   
-  sendEmail(data);
-  res.json(token)
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
 
-}catch(err){
+  const token = req.params.token;
 
-  }
-})
+  const hashToken = crypto.createHash("sha256").update(token).digest("hex");
 
+  const user = await User.findOne({
+    passwordResetToken: hashToken,
+    passwordResetExpire: {
+      $gt: Date.now(),
+    },
+  });
 
-
-const resetPassword=asyncHandler(async(req,res)=>{
-  const {password}=req.body;
-
-  const token=req.params.token
-  
-  const hashToken=crypto.createHash("sha256").update(token).digest("hex");
-  
-  const user=await User.findOne({
-      passwordResetToken:hashToken,
-      passwordResetExpire:{
-          $gt:Date.now()
-      },
-  })
-
-  if(!user) throw new Error('Token  Expired Please Try again')
-  user.password=password;
-  user.passwordResetToken=undefined
-  user.passwordResetExpire=undefined
+  if (!user) throw new Error("Token  Expired Please Try again");
+  user.password = password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpire = undefined;
   await user.save();
   res.json(user);
-
-})
-
+});
 
 const getWishlist = asyncHandler(async (req, res, next) => {
   try {
     const { _id } = req.user;
-   
-    const findUser = await User.findById(_id).populate("wishlist")
-   
+
+    const findUser = await User.findById(_id).populate("wishlist");
+
     res.json(findUser.wishlist);
   } catch (error) {
     next(error);
   }
 });
 
-
 //delete the product frrom wishlist
 const removeFromWishlist = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const  prodId= req.params.id;
-try {
+  const prodId = req.params.id;
+  try {
     const user = await User.findById(_id);
     const productIndex = user.wishlist.indexOf(prodId);
     if (productIndex === -1) {
-    return res.status(404).json({ message: "Product not found in wishlist" });
+      return res.status(404).json({ message: "Product not found in wishlist" });
     }
-     user.wishlist.splice(productIndex, 1);
+    user.wishlist.splice(productIndex, 1);
     await user.save();
-     res.json(user);
+    res.json(user);
   } catch (error) {
     throw new Error(error);
   }
 });
 
-//add product to acrt 
+//add product to acrt
 const userCart = asyncHandler(async (req, res) => {
+  const { _id, count } = req.body;
+  console.log(req.body);
 
-  const { _id, count} = req.body;
-  console.log(req.body)
-
- try{
-const produc= await Product.findById(_id);
-  if (!produc) {
-    return res.status(404).json({ error: "Product not found" });
-  }
-
-const updatedUser = await User.findOneAndUpdate(
-  { _id: req.user._id, "cart.products.product": { $ne: produc._id } },
-  {
-    $addToSet: {
-      "cart.products": {
-        product: produc._id,
-        count: count,
-        size:req?.body?.sizename,
-        color: req?.body?.colorname,
-        price: produc?.price,
-        total: produc?.price* count
-      },
-    },
-   
-  },
-  {
-    new: true,
-    upsert: true,
-    setDefaultsOnInsert: true
-  }
-).populate("cart.products.product", "_id name price").select('-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken');
-  
-  const cartTotal = updatedUser.cart?.products?.reduce((total, product) => {
-   
-    if (product.count > 0) {
-      return total + product.count*product.price;
-    } else {
-      return total;
+  try {
+    const produc = await Product.findById(_id);
+    if (!produc) {
+      return res.status(404).json({ error: "Product not found" });
     }
-   
-  }, 0);
 
-  
-  updatedUser.cart.cartTotal = cartTotal;
-  console.log(updatedUser)
-  res.status(200).json({ message: "Product removed successfully", cart: updatedUser?.cart });
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.user._id, "cart.products.product": { $ne: produc._id } },
+      {
+        $addToSet: {
+          "cart.products": {
+            product: produc._id,
+            count: count,
+            size: req?.body?.sizename,
+            color: req?.body?.colorname,
+            price: produc?.price,
+            total: produc?.price * count,
+          },
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    )
+      .populate("cart.products.product", "_id name price")
+      .select(
+        "-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken"
+      );
 
- }catch(err){
-throw new Error(err)
-}
-  
+    const cartTotal = updatedUser.cart?.products?.reduce((total, product) => {
+      if (product.count > 0) {
+        return total + product.count * product.price;
+      } else {
+        return total;
+      }
+    }, 0);
 
+    updatedUser.cart.cartTotal = cartTotal;
+    console.log(updatedUser);
+    res.status(200).json({
+      message: "Product removed successfully",
+      cart: updatedUser?.cart,
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
 });
-// update cart by updating productr 
+// update cart by updating productr
 const updateCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { product, count, color } = req.body;
@@ -520,81 +505,80 @@ const updateCart = asyncHandler(async (req, res) => {
         "cart.products.$.count": count,
         "cart.products.$.color": color,
         "cart.products.$.price": productExists.price,
-        "cart.products.$.total": productExists.price* count
+        "cart.products.$.total": productExists.price * count,
       },
     },
     {
       new: true,
       upsert: true,
-      setDefaultsOnInsert: true
+      setDefaultsOnInsert: true,
     }
-  ).populate("cart.products.product", "_id name price").select('-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken');
-  
+  )
+    .populate("cart.products.product", "_id name price")
+    .select(
+      "-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken"
+    );
+
   const cartTotal = updatedUser.cart.products.reduce((total, product) => {
-    
     if (product.count > 0) {
-      return total + product.count*product.price;
+      return total + product.count * product.price;
     } else {
       return total;
     }
-    
   }, 0);
 
-  
   updatedUser.cart.cartTotal = cartTotal;
-
 
   if (!updatedUser) {
     return res.status(400).json({ error: "Cart update failed" });
   }
 
-  res.status(200).json({ message: "Cart updated successfully", cart: updatedUser.cart });
+  res
+    .status(200)
+    .json({ message: "Cart updated successfully", cart: updatedUser.cart });
 });
 
 //get cart of the user
 const getUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-console.log(_id)
-  console.log("hello")
+  console.log(_id);
+  console.log("hello");
   validateMongoDbId(_id);
   try {
-    const updatedUser = await User.find({_id: _id })
-      .select('-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken')
+    const updatedUser = await User.find({ _id: _id })
+      .select(
+        "-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken"
+      )
       .populate("cart.products.product", "_id name price images");
-   
-    const cartTotal=updatedUser[0]
-  
-    const data=cartTotal?.cart?.products?.map((item)=>{
+
+    const cartTotal = updatedUser[0];
+
+    const data = cartTotal?.cart?.products?.map((item) => {
       return {
-        price:item?.price,
-        total:item?.total,
-        count:item?.count,
-        url:item?.product?.images[0]?.url,
-        _id:item?.product?._id
-      }
-    })
- 
+        price: item?.price,
+        total: item?.total,
+        count: item?.count,
+        url: item?.product?.images[0]?.url,
+        _id: item?.product?._id,
+      };
+    });
+
     const cartTota = cartTotal?.cart?.products?.reduce((total, product) => {
-      
       if (product?.count > 0) {
-        return total + product?.count*product?.price;
+        return total + product?.count * product?.price;
       } else {
         return total;
       }
-
     }, 0);
-  
-    
-    updatedUser[0].cart.cartTotal = cartTota ;
-    
- 
-     res.json({data:data,cartTotal:cartTota});
-  
+
+    updatedUser[0].cart.cartTotal = cartTota;
+
+    res.json({ data: data, cartTotal: cartTota });
   } catch (error) {
     throw new Error(error);
   }
 });
-//make cart to empty 
+//make cart to empty
 const emptyCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
@@ -604,22 +588,28 @@ const emptyCart = asyncHandler(async (req, res) => {
       $set: {
         cart: {
           products: [],
-          cartTotal: 0
-        }
-      }
+          cartTotal: 0,
+        },
+      },
     },
     {
       new: true,
       upsert: true,
-      setDefaultsOnInsert: true
+      setDefaultsOnInsert: true,
     }
-  ).populate("cart.products.product", "_id name price").select('-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken');
+  )
+    .populate("cart.products.product", "_id name price")
+    .select(
+      "-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken"
+    );
 
   if (!updatedUser) {
     return res.status(400).json({ error: "Cart empty failed" });
   }
 
-  res.status(200).json({ message: "Cart emptied successfully", cart: updatedUser.cart });
+  res
+    .status(200)
+    .json({ message: "Cart emptied successfully", cart: updatedUser.cart });
 });
 //apply coupen for offer
 const applyCoupon = asyncHandler(async (req, res) => {
@@ -695,79 +685,77 @@ const getOrders = asyncHandler(async (req, res) => {
   try {
     const userorders = await Order.find({ orderby: _id })
       .populate("products.product")
-    
+
       .exec();
-      
+
     res.json(userorders);
   } catch (error) {
     throw new Error(error);
   }
 });
 
-//delete product in the cart by id 
+//delete product in the cart by id
 const cartdeletebyId = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
-try{
-const updatedUser = await User.findOneAndUpdate(
-    { _id: req.user._id,},
-    { $pull: { "cart.products": { product: req?.params?.id} } },
-    { new: true }
-  ).populate("cart.products.product", "_id name price").select('-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken');
-  
-  const cartTotal = updatedUser.cart?.products?.reduce((total, product) => {
-   
-    if (product.count > 0) {
-      return total + product.count*product.price;
-    } else {
-      return total;
-    }
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.user._id },
+      { $pull: { "cart.products": { product: req?.params?.id } } },
+      { new: true }
+    )
+      .populate("cart.products.product", "_id name price")
+      .select(
+        "-_id -firstname -lastname -email -mobile -password -role -isBlocked -address -wishlist -createdAt -updatedAt -__v -refreshToken"
+      );
 
-  }, 0);
+    const cartTotal = updatedUser.cart?.products?.reduce((total, product) => {
+      if (product.count > 0) {
+        return total + product.count * product.price;
+      } else {
+        return total;
+      }
+    }, 0);
 
-  
-  updatedUser.cart.cartTotal = cartTotal;
-  res.status(200).json({ message: "Product removed successfully", cart: updatedUser.cart });
-}catch(err){
-
-throw new Error(err);
-}
-
-  
+    updatedUser.cart.cartTotal = cartTotal;
+    res.status(200).json({
+      message: "Product removed successfully",
+      cart: updatedUser.cart,
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
 });
-
 
 const getAllOrders = asyncHandler(async (req, res) => {
   try {
- 
-    const{_id}=req.user
+    const { _id } = req.user;
 
     validateMongoDbId(_id);
-   const admin=await User.findById(_id).select('super')
-   console.log(admin)
-   const orders = await Order.find()
-   .populate("products.product")
-   .populate({path:"orderby",select:"firstname lastname email mobile "})
-   .populate("add")
-   .exec();
-   
+    const admin = await User.findById(_id).select("super");
+    console.log(admin);
+    const orders = await Order.find()
+      .populate("products.product")
+      .populate({ path: "orderby", select: "firstname lastname email mobile " })
+      .populate("add")
+      .exec();
 
-if(admin.super===true){
-res.json(orders)
-}else if(admin.super===false){
-  const result = orders.filter(order => {
-    return order.products.some(product => {
-      return product?.product?.created?.posted?.toString() ===_id?.toString();  
-    });
-  });
-  res.json(result);
-return ;
-}
-
-
+    if (admin.super === true) {
+      res.json(orders);
+    } else if (admin.super === false) {
+      const result = orders.filter((order) => {
+        return order.products.some((product) => {
+          return (
+            product?.product?.created?.posted?.toString() === _id?.toString()
+          );
+        });
+      });
+      res.json(result);
+      return;
+    }
   } catch (error) {
     throw new Error(error);
-  }  
+  }
 });
 const getOrderByUserId = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -776,7 +764,7 @@ const getOrderByUserId = asyncHandler(async (req, res) => {
     const userorders = await Order.findOne({ orderby: id })
       .populate("products.product")
       .populate("orderby")
-     
+
       .exec();
     res.json(userorders);
   } catch (error) {
@@ -784,48 +772,49 @@ const getOrderByUserId = asyncHandler(async (req, res) => {
   }
 });
 
-
-
 //update order status
 const updateOrderStatus = asyncHandler(async (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
 
   const { id } = req.params;
   const { orderStatus, prod } = req.body;
 
   try {
     const isValidId = mongoose.Types.ObjectId.isValid(id);
-  
+
     if (!isValidId) {
-      return res.status(400).json({ message: 'Invalid ID' });
+      return res.status(400).json({ message: "Invalid ID" });
     }
 
-    const order = await Order.findById(id).populate('orderby')
+    const order = await Order.findById(id).populate("orderby");
     order.orderby.populate("address");
-    
-    console.log(order)
+
+    console.log(order);
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
-    
-    const product = order.products.find(p => p.product.toString() === prod.toString());
-   
-   
+
+    const product = order.products.find(
+      (p) => p.product.toString() === prod.toString()
+    );
+
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
-    
+
     product.orderStatus = orderStatus;
-    
+
     await order.save();
 
-    console.log(`Updated order status for product with id ${prod} to ${orderStatus}`);
+    console.log(
+      `Updated order status for product with id ${prod} to ${orderStatus}`
+    );
     console.log(order);
 
     res.json(order);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 // getAllOrders()
@@ -859,5 +848,5 @@ module.exports = {
   cartdeletebyId,
   removeFromWishlist,
   updateCart,
-  updateRole
+  updateRole,
 };

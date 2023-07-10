@@ -188,7 +188,7 @@ export default function ProductCard(props) {
             </pre>
             <span className="price" style={{ fontWeight: "bold" }}>
               {" "}
-              &nbsp;₹ {Discount > 0 ? price - (price * Discount) / 100 : price}
+              &nbsp;₹ {Math.floor(Discount > 0 ? price - (price * Discount) / 100 : price)}
             </span>
             <h6 className="card-title ">
               {title?.split(" ").slice(0, 4).join(" ")}{" "}

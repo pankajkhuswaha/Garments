@@ -189,12 +189,13 @@ header {
 
 footer {
   /* background-color: var(--color-232f3e); */
-  background: #038aa5;
+  /* background: #d42700 !important; */
+  background-color: #111827 !important;
 
 }
 
 footer:not(:first-child) {
-  border-top: 1px solid rgb(0, 174, 255);
+  border-top: 1px solid #ffffff;
 }
 
 footer .input-group-text {
@@ -1351,7 +1352,7 @@ img{
 /* todo naviagtion css */
 
 #navBar {
-  background: #00d4fff3 !important;
+  background: #ff2f00f3 !important  ;
   display: flex;
   position: fixed;
   height: 80px;
@@ -1381,7 +1382,7 @@ img{
 }
 
 #nav-sidebar {
-  background: #00d4fff3 !important;
+  background: #ff2f00f3 !important;
   position: fixed;
   left: -120vw;
   top: 0;
@@ -1400,22 +1401,27 @@ img{
   font-weight: 500;
   cursor: pointer !important;
 }
+.menubtn:hover{
+  color: white;
+}
 
-.menubtn:active,
-.menubtn:hover {
+.menubtnActive {
   width: 100%;
-  border: 2px solid #00d5ff;
+  border: 2px solid transparent;
   margin: 5px 0px;
   padding: 5px 1px 5px 18px;
-  background: #00d4fff3 !important;
-  color: #000 !important;
+  color: #ffffff;
+  background: #6b0101;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer !important;
 }
 
 .logo-Sidebar {
   height: 80px;
   cursor: pointer;
-  background: #00d4fff3 !important;
-  border-bottom: 2px solid #00d5ff;
+  background: #ff2f00f3 !important;
+  border-bottom: 2px solid #ff2f00f3;
 }
 
 /* product card */
@@ -1433,4 +1439,8 @@ img{
     width: 48% !important;
     cursor: pointer;
 }
+}
+
+.about-page h6{
+  color: #5f5c5c !important;
 }

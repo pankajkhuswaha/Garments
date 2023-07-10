@@ -110,7 +110,7 @@ export default function Signup() {
                 ) : null}
               </div>
 
-              <div className="form-floating">
+              <div className="form-floating mb-4">
                 <CustomInput
                   type="password"
                   label="password"

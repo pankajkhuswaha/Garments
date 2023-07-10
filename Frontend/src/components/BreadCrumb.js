@@ -1,8 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export default function BreadCrumb(props) {
-    const {title} = props;
+    const {title,link} = props;
   return (
     <>
       <div className="breadcrumb py-2">
@@ -11,12 +11,12 @@ export default function BreadCrumb(props) {
             <div className="col-12 d-flex justify-content-center">
               <nav aria-label="breadcrumb mb-0">
                 <ol className="breadcrumb">
-                  <div className="breadcrumb-item active" aria-current="page">
+                  <NavLink to={"/"} className="breadcrumb-item active" aria-current="page">
                     Home 
-                  </div>
-                  <div className="breadcrumb-item active" aria-current="page">
+                  </NavLink>
+                  <NavLink to={link} className="breadcrumb-item active" aria-current="page">
                     {title}
-                  </div>
+                  </NavLink>
                 </ol>
               </nav>
             </div>

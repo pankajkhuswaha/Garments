@@ -23,6 +23,7 @@ const sendEmail=asyncHandle(async(data,req,res)=>{
     text: data.text, // plain text body
     html: data.html, // html body
   });
+  
 
   console.log("Message sent: %s", info.messageId);
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
